@@ -1,0 +1,20 @@
+<div id="article_wrap">
+    <div id="article_list">
+        <% @posts.each do |post| %>
+            <div>
+                <h2><%= link_to post.title, post_path(post) %></h2>
+                <p><%= l post.updated_at %></p>
+                <!-- login -->
+                <%= link_to '編集', edit_post_path(post), class: 'command'%>
+                <%= link_to '削除',
+                    post_path(post), 
+                    method: :delete,
+                    class: 'command',
+                    data: { confirm: 'Sure??'} %>
+            </div>
+        <% end %>
+    </div>
+    <div id="sidebar">
+        <%= render "layouts/sidebar" %>
+    </div>
+</div>
