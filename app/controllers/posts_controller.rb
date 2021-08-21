@@ -18,12 +18,12 @@ class PostsController < ApplicationController
   def create
     # 送信されたデータが post をキーにして title と body があるハッシュかどうかを確認
     @post = Post.new(post_params)
-    # @post[:user_id] = current_user[:id]
+    @post[:user_id] = current_user[:id]
     # debugger
     # validation に引っかからない場合
     if @post.save
       # redirect
-      redirect_to posts_path
+      redirect_to root_path
     else
       # エラーメッセージの表示
       # render plain: @post.errors.inspect
@@ -33,7 +33,11 @@ class PostsController < ApplicationController
 
   def edit
     @post = Post.find(params[:id])
-    # unless
+    unless @post[:user_id] == current_user[:id]
+      # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
+      redirect_to(root_url)
+      flash[:danger] = 'This is not your post'
+    end
   end
 
   def update
@@ -47,9 +51,14 @@ class PostsController < ApplicationController
 
   def destroy
     @post = Post.find(params[:id])
-    # unless
-    @post.destroy
-    redirect_to posts_path
+    unless @post[:user_id] == current_user[:id]
+      # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
+      redirect_to(root_url)
+      flash[:danger] = 'This is not your post'
+    else
+        @post.destroy
+        redirect_to root_path
+    end
   end
 
   private
