@@ -18,7 +18,7 @@ class PostsController < ApplicationController
   def create
     # 送信されたデータが post をキーにして title と body があるハッシュかどうかを確認
     @post = Post.new(post_params)
-    @post[:user_id] = current_user[:id]
+    @post[:email] = current_user[:email]
     # debugger
     # validation に引っかからない場合
     if @post.save
@@ -33,7 +33,7 @@ class PostsController < ApplicationController
 
   def edit
     @post = Post.find(params[:id])
-    unless @post[:user_id] == current_user[:id]
+    unless @post[:email] == current_user[:email]
       # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
       redirect_to(root_url)
       flash[:danger] = 'This is not your post'
@@ -51,7 +51,7 @@ class PostsController < ApplicationController
 
   def destroy
     @post = Post.find(params[:id])
-    unless @post[:user_id] == current_user[:id]
+    unless @post[:email] == current_user[:email]
       # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
       redirect_to(root_url)
       flash[:danger] = 'This is not your post'
