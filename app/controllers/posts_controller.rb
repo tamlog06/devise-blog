@@ -55,6 +55,8 @@ class PostsController < ApplicationController
       flash[:danger] = 'This is not your post'
     else
         @post.destroy
+        # redisからも削除
+        REDIS.zrem "ranking", @post.id
         redirect_to root_path
     end
   end

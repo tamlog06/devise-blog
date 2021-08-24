@@ -9,3 +9,5 @@
 10.times do |i|
   Post.create(title: "title #{i}", body: "body #{i}", email: "#{i}@gmail.com")
 end
+
+REDIS.flushall
