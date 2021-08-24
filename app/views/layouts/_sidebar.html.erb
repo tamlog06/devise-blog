@@ -1,5 +1,6 @@
 <h2>★PV数ランキング</h2>
-<!-- ranking
--->
 <ul>
+    <% @ranking_posts.each do |post| %>
+    <li><%= link_to post.title, post_path(post) %><span> (<%= REDIS.zscore("ranking", post.id).to_i %>PV) </span></li>
+    <% end %>
 </ul>

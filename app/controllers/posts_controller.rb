@@ -2,31 +2,31 @@ class PostsController < ApplicationController
 
   def index
     @posts = Post.all.order(created_at: 'desc')
-    # if
+    ids = REDIS.zrevrangebyscore "ranking", "+inf", 0, limit: [0, 3]
+    @ranking_posts = ids.map{ |id| Post.find(id) }
+    if @ranking_posts.count < 3
+        adding_posts = Post.order(published_at: :DESC, updated_at: :DESC).where.not(id: ids).limit(3 - @ranking_posts.count)
+        @ranking_posts.concat(adding_posts)
+    end
   end
 
   def show
     @post = Post.find(params[:id])
-    # REDIS.zincrby "ranking", 1, @post.id
+    REDIS.zincrby "ranking", 1, @post.id
   end
 
   def new
     @post = Post.new
-    # @user = User.find(params[:id])
   end
 
   def create
     # 送信されたデータが post をキーにして title と body があるハッシュかどうかを確認
     @post = Post.new(post_params)
     @post[:email] = current_user[:email]
-    # debugger
     # validation に引っかからない場合
     if @post.save
-      # redirect
       redirect_to root_path
     else
-      # エラーメッセージの表示
-      # render plain: @post.errors.inspect
       render 'new'
     end
   end
@@ -34,7 +34,6 @@ class PostsController < ApplicationController
   def edit
     @post = Post.find(params[:id])
     unless @post[:email] == current_user[:email]
-      # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
       redirect_to(root_url)
       flash[:danger] = 'This is not your post'
     end
@@ -52,7 +51,6 @@ class PostsController < ApplicationController
   def destroy
     @post = Post.find(params[:id])
     unless @post[:email] == current_user[:email]
-      # flash.now[:danger] = "#{@post[:user_id]}, #{current_user[:id]}"
       redirect_to(root_url)
       flash[:danger] = 'This is not your post'
     else
@@ -63,7 +61,7 @@ class PostsController < ApplicationController
 
   private
     def post_params
-      params.require(:post).permit(:title, :body)
+      params.require(:post).permit(:title, :body, :email)
     end
   
 end
